@@ -43,6 +43,12 @@ dist-ssr
 .claude-session.json
 *.credentials.json
 
+# Firebase / Google Service Account credentials
+firebase-service-account.json
+firebase-service-account.json.json
+*-service-account.json
+*serviceAccount*.json
+
 # Claude session logs and cache
 history.jsonl
 debug.log
