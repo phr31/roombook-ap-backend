@@ -1,0 +1,26 @@
+{
+  "name": "roombook-ap-backend",
+  "version": "1.0.0",
+  "description": "Backend for RoomBook AP — meeting room scheduling system",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "db:init": "psql $DATABASE_URL -f sql/init.sql",
+    "db:migrate": "node --input-type=module -e \"import('./src/migrate.js').then(m=>m.runMigrations()).then(()=>process.exit(0))\"",
+    "db:seed": "node scripts/seed.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "firebase-admin": "^14.1.0",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.13",
+    "pg": "^8.22.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.3"
+  }
+}

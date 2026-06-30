@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Room {
+  id       Int    @id @default(autoincrement())
+  name     String @unique
+  capacity Int?
+
+  @@map("rooms")
+}
+
+// Global participant registry — each email is stored once.
+// Bookings reference participant IDs via the `participants` JSON column.
+model BookingParticipant {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+
+  @@map("booking_participants")
+}
+
+model Booking {
+  id             Int       @id @default(autoincrement())
+  date           DateTime  @db.Date
+  startTime      String
+  endTime        String
+  environment    String
+  room           String?
+  meetingLink    String?
+  title          String?
+  createdBy      String
+  createdByEmail String
+  createdAt      DateTime  @default(now())
+  reminderSentAt DateTime?
+  // Stored as a JSON array of BookingParticipant IDs: e.g. [1, 3, 7]
+  participants   Json      @default("[]")
+
+  @@map("bookings")
+}
