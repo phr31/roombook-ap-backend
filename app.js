@@ -12,7 +12,7 @@ const app = express();
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
 
-const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:8080')
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:8080' || 'https://roombook-ap.vercel.app')
   .split(',')
   .map((s) => s.trim());
 
