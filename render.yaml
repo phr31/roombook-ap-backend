@@ -1,0 +1,59 @@
+# Render Blueprint — RoomBook AP Backend
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Web Service (processo persistente) — necessário porque o app roda um job
+# node-cron (lembretes) e mantém pool de conexões PostgreSQL. As migrações e o
+# seed das salas rodam automaticamente no boot (runMigrations() em app.js).
+#
+# As variáveis marcadas com `sync: false` NÃO ficam no repositório: você as
+# define manualmente no dashboard da Render (Environment) na primeira vez.
+
+services:
+  - type: web
+    name: roombook-ap-backend
+    runtime: node
+    plan: free
+    region: ohio          # mesma região do PostgreSQL já existente
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+
+      # ─── Origens permitidas para CORS (domínio da Vercel) ───────────────
+      # Atualize com a URL final da Vercel após publicar o frontend.
+      - key: FRONTEND_URL
+        sync: false
+
+      # ─── PostgreSQL ─────────────────────────────────────────────────────
+      - key: POSTGRESQL_DATABASE
+        sync: false
+      - key: POSTGRESQL_HOSTNAME
+        sync: false
+      - key: POSTGRESQL_PORT
+        sync: false
+      - key: POSTGRESQL_USERNAME
+        sync: false
+      - key: POSTGRESQL_PASSWORD
+        sync: false
+
+      # ─── Firebase Admin SDK (JSON do service account em base64) ─────────
+      - key: FIREBASE_SERVICE_ACCOUNT_BASE64
+        sync: false
+
+      # ─── SMTP (envio de e-mails / lembretes) ────────────────────────────
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_SECURE
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM
+        sync: false
