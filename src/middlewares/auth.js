@@ -26,12 +26,6 @@ export default async function authenticate(req, res, next) {
     return res.status(403).json({ message: 'Sua conta não possui um e-mail associado.' });
   }
 
-  // Cadastro por senha exige e-mail confirmado; Google/Microsoft já provam a
-  // posse do endereço no próprio provedor.
-  if (decoded.firebase?.sign_in_provider === 'password' && !decoded.email_verified) {
-    return res.status(403).json({ message: 'Confirme seu e-mail antes de acessar o RoomBook.' });
-  }
-
   // Este é o gate real: verifyIdToken sem checkRevoked aceita tokens de usuários
   // já deletados até expirarem (~1h), então a allowlist aqui é o que fecha a
   // janela entre criar e remover uma conta não autorizada.
