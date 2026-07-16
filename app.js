@@ -4,6 +4,7 @@ import express from 'express';
 import cors from 'cors';
 
 import bookingRoutes from './src/routes/bookingRoutes.js';
+import allowlistRoutes from './src/routes/allowlistRoutes.js';
 import errorHandler from './src/middlewares/errorHandler.js';
 import { startReminderJob } from './src/jobs/reminderJob.js';
 import { runMigrations } from './src/migrate.js';
@@ -32,6 +33,7 @@ app.use(express.json());
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/allowlist', allowlistRoutes);
 
 app.use((_req, res) => res.status(404).json({ message: 'Rota nao encontrada' }));
 app.use(errorHandler);
