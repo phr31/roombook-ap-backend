@@ -41,7 +41,54 @@ export async function isEmailAllowed(email) {
   return allowed;
 }
 
+const LIST_LIMIT = 500;
+
+let listCache = null; // { at, emails }
+let listInflight = null;
+
+async function readList() {
+  // select('active'): o e-mail é o ID do doc, então só o campo do filtro trafega.
+  const snap = await getFirestore()
+    .collection('allowedEmails')
+    .select('active')
+    .limit(LIST_LIMIT)
+    .get();
+
+  if (snap.size === LIST_LIMIT) {
+    console.warn(`[Allowlist] atingiu LIST_LIMIT=${LIST_LIMIT}; e-mails além disso não são sugeridos.`);
+  }
+
+  // Espelha isEmailAllowed: `active` AUSENTE significa ativo. Por isso o filtro é
+  // em JS e não no Firestore — where('active','!=',false) descartaria os docs sem
+  // o campo, que são justamente os que devem entrar.
+  return snap.docs
+    .filter((d) => d.data()?.active !== false)
+    .map((d) => d.id)
+    .sort();
+}
+
+/** Lista os e-mails ativos. Cache próprio: um miss aqui custa N leituras, não 1. */
+export async function listActiveEmails() {
+  const now = Date.now();
+  if (listCache && now - listCache.at < TTL_MS) return listCache.emails;
+  if (listInflight) return listInflight;
+
+  const p = readList()
+    .then((emails) => {
+      listCache = { at: Date.now(), emails };
+      return emails;
+    })
+    .finally(() => {
+      listInflight = null;
+    });
+
+  listInflight = p;
+  return p; // devolve `p`, não `listInflight` — o finally já pode tê-lo zerado.
+}
+
 /** Exposto para testes. */
 export function clearAllowlistCache() {
   cache.clear();
+  listCache = null;
+  listInflight = null;
 }
